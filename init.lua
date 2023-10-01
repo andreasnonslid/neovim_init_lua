@@ -22,17 +22,32 @@ require('lazy').setup(
 
 require('leap').add_default_mappings()
 
--- Remap hjkl to arrow keys
-local map = vim.api.nvim_set_keymap
--- normal mode
-map('n', 'j', '<Left>', { noremap = true })
-map('n', 'k', '<Down>', { noremap = true })
-map('n', 'i', '<Up>', { noremap = true })
-map('n', 'l', '<Right>', { noremap = true })
-map('n', 'h', 'i', { noremap = true })
--- visual mode
-map('v', 'j', '<Left>', { noremap = true })
-map('v', 'k', '<Down>', { noremap = true })
-map('v', 'i', '<Up>', { noremap = true })
-map('v', 'l', '<Right>', { noremap = true })
-map('v', 'h', 'I', { noremap = true })
+-- Define a function to simplify key mapping
+local function map(mode, key, result, opts)
+  opts = vim.tbl_extend('keep', opts or {}, { noremap = true, silent = true })
+  vim.api.nvim_set_keymap(mode, key, result, opts)
+end
+
+-- Remap movement keys
+local movement_mappings = {
+  n = { j = '<Left>', k = '<Down>', i = '<Up>', l = '<Right>', h = 'i' },
+  v = { j = '<Left>', k = '<Down>', i = '<Up>', l = '<Right>', h = 'I' },
+}
+
+for mode, mappings in pairs(movement_mappings) do
+  for key, result in pairs(mappings) do
+      map(mode, key, result)
+  end
+end
+
+-- Remap Shift + movement keys
+local shift_movement_mappings = {
+  n = { J = '<S-Left>', K = '<S-Down>', I = '<S-Up>', L = '<S-Right>', H = 'I' },
+  v = { J = '<S-Left>', K = '<S-Down>', I = '<S-Up>', L = '<S-Right>', H = '^' },
+}
+
+for mode, mappings in pairs(shift_movement_mappings) do
+  for key, result in pairs(mappings) do
+      map(mode, key, result)
+  end
+end
